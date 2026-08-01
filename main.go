@@ -54,7 +54,7 @@ func run(composeDir, normalDir string) error {
 			continue
 		}
 
-		unit := generateUnit(info, composeDir)
+		unit := generateUnit(info)
 		unitName := info.Name + ".service"
 		unitPath := filepath.Join(normalDir, unitName)
 
@@ -75,25 +75,25 @@ func run(composeDir, normalDir string) error {
 	return nil
 }
 
-// scanComposeFiles returns all *.yml and *.yaml files in dir.
+// scanComposeFiles returns all *.yml and *.yaml files in dir, recursively.
 func scanComposeFiles(dir string) ([]string, error) {
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, nil
-		}
-		return nil, err
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil, nil
 	}
 
 	var files []string
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
+	err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil
 		}
-		ext := filepath.Ext(e.Name())
+		if d.IsDir() {
+			return nil
+		}
+		ext := filepath.Ext(d.Name())
 		if ext == ".yml" || ext == ".yaml" {
-			files = append(files, filepath.Join(dir, e.Name()))
+			files = append(files, path)
 		}
-	}
-	return files, nil
+		return nil
+	})
+	return files, err
 }
