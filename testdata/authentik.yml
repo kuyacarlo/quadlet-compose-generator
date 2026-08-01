@@ -1,0 +1,59 @@
+name: authentik
+
+services:
+  server:
+    image: ghcr.io/goauthentik/server:2024.6
+    command: server
+    environment:
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/pg_pass
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    depends_on:
+      - postgresql
+      - redis
+    networks:
+      - default
+      - backend
+
+  worker:
+    image: ghcr.io/goauthentik/server:2024.6
+    command: worker
+    environment:
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/pg_pass
+    depends_on:
+      - postgresql
+      - redis
+
+  postgresql:
+    image: docker.io/library/postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: file:///run/secrets/pg_pass
+      POSTGRES_USER: authentik
+      POSTGRES_DB: authentik
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  redis:
+    image: docker.io/library/redis:alpine
+    command: --save 60 1 --loglevel warning
+    volumes:
+      - redis:/data
+
+volumes:
+  database:
+  redis:
+
+networks:
+  backend:
+    external: true
