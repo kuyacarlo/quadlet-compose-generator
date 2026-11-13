@@ -9,6 +9,11 @@ BuildRequires:  golang >= 1.22
 BuildRequires:  git
 Provides:       bundled(golang(*))
 
+# The Go binary is built with -s -w (stripped), so there is no debug
+# information to extract. Disable debuginfo/debugsource generation to
+# avoid the "Empty %files file debugsourcefiles.list" build error.
+%global debug_package %{nil}
+
 %description
 quadlet-compose-generator is a systemd user generator that auto-discovers Podman Compose
 files in ~/.config/containers/compose/ and generates systemd service units on
@@ -35,5 +40,5 @@ go test ./...
 %{_prefix}/lib/systemd/user-generators/%{name}
 
 %changelog
-* Sat Aug 02 2026 kuyacarlo <kuyacarlo@users.noreply.github.com> - 0.1.0-1
+* Sun Aug 02 2026 kuyacarlo <kuyacarlo@users.noreply.github.com> - 0.1.0-1
 - Initial package
