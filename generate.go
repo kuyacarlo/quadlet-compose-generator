@@ -19,8 +19,6 @@ func generateUnit(info *ComposeInfo) string {
 	b.WriteString("\n")
 	b.WriteString("[Unit]\n")
 	b.WriteString(fmt.Sprintf("Description=Hitch: %s\n", info.Name))
-	b.WriteString("After=network-online.target\n")
-	b.WriteString("Requires=network-online.target\n")
 	b.WriteString("\n")
 	b.WriteString("[Service]\n")
 	b.WriteString("Type=oneshot\n")
