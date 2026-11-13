@@ -8,24 +8,28 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage: hitch-generator <normal-dir> [early-dir] [late-dir]\n")
+		fmt.Fprintf(os.Stderr, "Usage: quadlet-compose-generator <normal-dir> [early-dir] [late-dir]\n")
 		os.Exit(1)
 	}
 
 	normalDir := os.Args[1]
 
-	composeDir := os.Getenv("HITCH_COMPOSE_DIR")
+	composeDir := os.Getenv("QUADLET_COMPOSE_DIR")
+	if composeDir == "" {
+		// Retain compatibility with users of the previous project name.
+		composeDir = os.Getenv("HITCH_COMPOSE_DIR")
+	}
 	if composeDir == "" {
 		home, err := os.UserHomeDir()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "hitch-generator: cannot determine home directory: %v\n", err)
+			fmt.Fprintf(os.Stderr, "quadlet-compose-generator: cannot determine home directory: %v\n", err)
 			os.Exit(1)
 		}
 		composeDir = filepath.Join(home, ".config", "containers", "compose")
 	}
 
 	if err := run(composeDir, normalDir); err != nil {
-		fmt.Fprintf(os.Stderr, "hitch-generator: %v\n", err)
+		fmt.Fprintf(os.Stderr, "quadlet-compose-generator: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -50,7 +54,7 @@ func run(composeDir, normalDir string) error {
 	for _, f := range files {
 		info, err := parseComposeFile(f)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "hitch-generator: skipping %s: %v\n", f, err)
+			fmt.Fprintf(os.Stderr, "quadlet-compose-generator: skipping %s: %v\n", f, err)
 			continue
 		}
 

@@ -1,4 +1,4 @@
-NAME = hitch-generator
+NAME = quadlet-compose-generator
 
 build:
 	go build -o $(NAME) .

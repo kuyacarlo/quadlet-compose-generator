@@ -1,4 +1,4 @@
-NAME = hitch-generator
+NAME = quadlet-compose-generator
 VERSION = $(shell grep '^Version:' ../$(NAME).spec | awk '{print $$2}')
 
 srpm:

@@ -1,37 +1,45 @@
-# hitch-generator
+# quadlet-compose-generator
 
-A systemd user generator that creates service units for Podman Compose files.
+`quadlet-compose` manages Podman Compose projects through systemd user services.
+Its generator, `quadlet-compose-generator`, discovers Compose YAML files and
+generates a systemd service unit for each project, so you can manage Compose
+projects with `systemctl --user`.
+
+The project is maintained by [kuyacarlo](https://github.com/kuyacarlo).
 
 ## How it works
 
-systemd invokes generators during boot/reload:
+systemd invokes the generator during user manager startup and reload:
 
-```
-hitch-generator <normal-dir> [early-dir] [late-dir]
+```text
+quadlet-compose-generator <normal-dir> [early-dir] [late-dir]
 ```
 
-The generator scans `~/.config/containers/compose/` (or `$HITCH_COMPOSE_DIR`) for `*.yml`/`*.yaml` files and produces a `.service` unit for each one. Services are wired into `default.target.wants` so they start automatically.
+The generator scans `~/.config/containers/compose/` (or the directory set by
+`QUADLET_COMPOSE_DIR`) recursively for `*.yml` and `*.yaml` files. It writes a
+`.service` unit for each Compose project and links each unit from
+`default.target.wants` so it starts with the user's default target.
 
 Each generated unit:
-- Ensures external Podman networks exist (`ExecStartPre`)
+
+- Creates missing external Podman networks before startup
 - Runs `podman compose up -d` on start
 - Runs `podman compose down` on stop
-- Supports reload via `podman compose up -d --force-recreate`
+- Supports reload through `podman compose up -d --force-recreate`
 
 ## Install
 
+Build and install the generator into the systemd user generator directory:
+
 ```bash
 make install
-# Installs to ~/.config/systemd/user-generators/hitch-generator
-```
-
-Then reload systemd to pick up the generator:
-
-```bash
 systemctl --user daemon-reload
 ```
 
-## Build & Test
+`make install` places `quadlet-compose-generator` in
+`~/.config/systemd/user-generators/`.
+
+## Build and test
 
 ```bash
 make build
@@ -42,7 +50,8 @@ make test
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `HITCH_COMPOSE_DIR` | `$HOME/.config/containers/compose/` | Directory to scan for compose files |
+| `QUADLET_COMPOSE_DIR` | `$HOME/.config/containers/compose/` | Directory to scan for Compose YAML files |
+| `HITCH_COMPOSE_DIR` | — | Legacy alias, used only when `QUADLET_COMPOSE_DIR` is unset |
 
 ## License
 

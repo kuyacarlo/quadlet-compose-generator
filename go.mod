@@ -1,4 +1,4 @@
-module github.com/kuyacarlo/hitch-generator
+module github.com/kuyacarlo/quadlet-compose-generator
 
 go 1.22
 

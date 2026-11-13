@@ -1,16 +1,16 @@
-Name:           hitch-generator
+Name:           quadlet-compose-generator
 Version:        0.1.0
 Release:        1%{?dist}
 Summary:        Systemd user generator for Podman Compose files
 License:        MIT
-URL:            https://github.com/kuyacarlo/hitch-generator
+URL:            https://github.com/kuyacarlo/quadlet-compose-generator
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  golang >= 1.22
 BuildRequires:  git
 Provides:       bundled(golang(*))
 
 %description
-hitch-generator is a systemd user generator that auto-discovers Podman Compose
+quadlet-compose-generator is a systemd user generator that auto-discovers Podman Compose
 files in ~/.config/containers/compose/ and generates systemd service units on
 daemon-reload. Drop a compose.yml, reload, start.
 
